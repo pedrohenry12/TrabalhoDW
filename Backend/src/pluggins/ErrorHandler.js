@@ -1,4 +1,4 @@
-import AppError from '../errors/AppError.js'
+import AppError from '../errors/App-error.js'
 
 export default function errorHandler(app) {
   app.setErrorHandler((error, req, res) => {

@@ -1,17 +1,14 @@
 import "dotenv/config"
 import Fastify from 'fastify'
 import pool from './database/pool.js'
-import AppError from './errors/App-error.js'
+import errorHandler from './pluggins/ErrorHandler.js'
+import alunoRoutes from './features/alunos/alunos.routes.js'
 
 const app = Fastify()
 
-app.get('/teste', (req, res) => {
-  res.send({ status: 'ok' })
-})
+errorHandler(app)
 
-app.get('/erro-teste', () => {
-  throw new AppError('testando o error handler', 400)
-})
+app.register(alunoRoutes)
 
 pool.query('SELECT NOW()')
   .then(res => console.log('banco conectado:', res.rows[0]))
