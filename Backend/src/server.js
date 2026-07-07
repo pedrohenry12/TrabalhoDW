@@ -14,7 +14,6 @@ errorHandler(app)
 app.register(alunoRoutes)
 app.register(exercicioRoutes)
 app.register(planoRoutes)
-
 app.register(avaliacaoFisicaRoutes)
 
 pool.query('SELECT NOW()')
