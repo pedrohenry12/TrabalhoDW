@@ -12,6 +12,8 @@
   "description": "",
   "type": "module",
   "dependencies": {
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^6.0.0",
     "dotenv": "^17.4.2",
     "fastify": "^5.10.0",
     "pg": "^8.22.0"
