@@ -10,6 +10,14 @@ class AlunoService {
     return this.alunoRepository.findAll()
   }
 
+  async findCompleto(id) {
+  const aluno = await this.alunoRepository.findCompleto(id)
+  if (!aluno) {
+    throw new AppError('Aluno não encontrado', 404)
+  }
+  return aluno
+}
+
   async findById(id) {
     const aluno = await this.alunoRepository.findById(id)
     if (!aluno) {

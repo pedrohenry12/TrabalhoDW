@@ -11,6 +11,7 @@ const alunoController = new AlunoController(alunoService)
 
 export default async function alunoRoutes(app) {
   app.get('/alunos', (req, res) => alunoController.findAll(req, res))
+  app.get('/alunos/:id/completo', (req, res) => alunoController.findCompleto(req, res))
   app.get('/alunos/:id', (req, res) => alunoController.findById(req, res))
   app.post('/alunos', (req, res) => alunoController.create(req, res))
   app.patch('/alunos/:id', (req, res) => alunoController.update(req, res))

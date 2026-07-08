@@ -13,6 +13,77 @@ class AlunoRepository {
     return result.rows
   }
 
+  async findCompleto(id) {
+  const aluno = await this.pool.query(`
+    SELECT aluno.id, aluno.nome, aluno.email, aluno.telefone, aluno.criado_em,
+           plano.nome AS plano_nome, plano.preco AS plano_preco,
+           avaliacao_fisica.peso_kg, avaliacao_fisica.altura_cm,
+           avaliacao_fisica.percentual_gordura, avaliacao_fisica.data_avaliacao
+    FROM aluno
+    INNER JOIN plano ON aluno.plano_id = plano.id
+    LEFT JOIN avaliacao_fisica ON avaliacao_fisica.aluno_id = aluno.id
+    WHERE aluno.id = $1
+  `, [id])
+
+  if (!aluno.rows[0]) return null
+
+  const treinos = await this.pool.query(`
+    SELECT treino.id AS treino_id, treino.nome AS treino_nome,
+           aluno_treino.data_inicio,
+           exercicio.id AS exercicio_id, exercicio.nome AS exercicio_nome,
+           exercicio.grupo_muscular,
+           treino_exercicio.series, treino_exercicio.repeticoes
+    FROM aluno_treino
+    INNER JOIN treino ON aluno_treino.treino_id = treino.id
+    LEFT JOIN treino_exercicio ON treino_exercicio.treino_id = treino.id
+    LEFT JOIN exercicio ON exercicio.id = treino_exercicio.exercicio_id
+    WHERE aluno_treino.aluno_id = $1
+    ORDER BY treino.id
+  `, [id])
+
+  const dados = aluno.rows[0]
+
+  const treinosMap = {}
+  for (const row of treinos.rows) {
+    if (!treinosMap[row.treino_id]) {
+      treinosMap[row.treino_id] = {
+        id: row.treino_id,
+        nome: row.treino_nome,
+        data_inicio: row.data_inicio,
+        exercicios: []
+      }
+    }
+    if (row.exercicio_id) {
+      treinosMap[row.treino_id].exercicios.push({
+        id: row.exercicio_id,
+        nome: row.exercicio_nome,
+        grupo_muscular: row.grupo_muscular,
+        series: row.series,
+        repeticoes: row.repeticoes
+      })
+    }
+  }
+
+  return {
+    id: dados.id,
+    nome: dados.nome,
+    email: dados.email,
+    telefone: dados.telefone,
+    criado_em: dados.criado_em,
+    plano: {
+      nome: dados.plano_nome,
+      preco: dados.plano_preco
+    },
+    avaliacao_fisica: dados.peso_kg ? {
+      peso_kg: dados.peso_kg,
+      altura_cm: dados.altura_cm,
+      percentual_gordura: dados.percentual_gordura,
+      data_avaliacao: dados.data_avaliacao
+    } : null,
+    treinos: Object.values(treinosMap)
+  }
+}
+
   async findById(id) {
     const result = await this.pool.query(`
       SELECT aluno.id, aluno.nome, aluno.email, aluno.telefone, aluno.criado_em,
