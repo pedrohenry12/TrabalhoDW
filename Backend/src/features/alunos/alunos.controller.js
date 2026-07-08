@@ -8,6 +8,12 @@ class AlunoController {
     return res.status(200).send(alunos)
   }
 
+  async findCompleto(req, res) {
+  const { id } = req.params
+  const aluno = await this.alunoService.findCompleto(id)
+  return res.status(200).send(aluno)
+}
+
   async findById(req, res) {
     const { id } = req.params
     const aluno = await this.alunoService.findById(id)
